@@ -110,3 +110,6 @@ dist
 
 # Documentation
 README.private
+
+# Docker test containers
+containers/
