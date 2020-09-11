@@ -6,10 +6,8 @@ describe('GET /api/v1', () => {
   it('responds with a json message', (done) => {
     request(app)
       .get('/api/v1')
-      .set('Accept', 'application/json')
-      .expect('Content-Type', /json/)
-      .expect(200, {
-        message: 'api working'
-      }, done);
+      .expect(302)
+      .expect('Location', '/')
+      .end(done);
   });
 });

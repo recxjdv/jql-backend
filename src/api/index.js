@@ -7,11 +7,8 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   // Redirect for API
-  // const baseUri = '/';
-  // res.redirect(baseUri);
-  res.json({
-    message: 'api working'
-  });
+  const baseUri = '/';
+  res.redirect(baseUri);
 });
 
 // Mount the routes
