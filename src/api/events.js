@@ -5,6 +5,11 @@ const Joi = require('joi');
 const db = monk(process.env.MONGO_URI);
 const events = db.get('events');
 
+// Helper functions
+// const helpers = require('../helpers/helpers');
+const { hashString } = require('../helpers/helpers');
+// const { arrNoDupe } = require('../helpers/helpers');
+
 // Establish the event schema
 const createEventSchema = Joi.object({
   // method: jQuery method name (e.g. .html, .append etc)
@@ -58,6 +63,17 @@ router.post('/', async (req, res, next) => {
   try {
     // Validate the body
     const value = await createEventSchema.validateAsync(req.body);
+
+    // Add internal record elements
+    const count = 1;
+    const knownSafe = 0;
+    const stringHash = hashString(value.string);
+    const hashHrefString = hashString(`${value.href}|${value.string}|${value.debug}`);
+    value.count = count;
+    value.knownSafe = knownSafe;
+    value.stringHash = stringHash;
+    value.hashHrefString = hashHrefString;
+
     const inserted = await events.insert(value);
     res.json(inserted);
   } catch (error) {
