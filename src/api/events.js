@@ -1,9 +1,8 @@
 const express = require('express');
-const monk = require('monk');
 const Joi = require('joi');
 
-const db = monk(process.env.MONGO_URI);
-const events = db.get('events');
+// Data store
+const events = require('../config/db');
 
 // Helper functions
 // const helpers = require('../helpers/helpers');
@@ -72,7 +71,14 @@ router.post('/', async (req, res, next) => {
 
     // Insert event record
     const inserted = await events.insert(value);
-    res.json(inserted);
+    if (inserted) {
+      const message = `jQuery event successfully inserted, id: ${inserted._id}`;
+      res.json({
+        message
+      });
+    } else {
+      next();
+    }
   } catch (error) {
     next(error);
   }
@@ -87,6 +93,7 @@ router.put('/:id', async (req, res, next) => {
       _id: id
     };
     // FIXME: This put should use a different Joi validation schema
+    // TODO: Check on update that an updated timestamp is added by the monk middleware
     const value = await createEventSchema.validateAsync(req.body);
     const update = {
       $set: value
