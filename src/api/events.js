@@ -65,15 +65,12 @@ router.post('/', async (req, res, next) => {
     const value = await createEventSchema.validateAsync(req.body);
 
     // Add internal record elements
-    const count = 1;
-    const knownSafe = 0;
-    const stringHash = hashString(value.string);
-    const hashHrefString = hashString(`${value.href}|${value.string}|${value.debug}`);
-    value.count = count;
-    value.knownSafe = knownSafe;
-    value.stringHash = stringHash;
-    value.hashHrefString = hashHrefString;
+    value.count = 1;
+    value.knownSafe = 0;
+    value.stringHash = hashString(value.string);
+    value.hashHrefString = hashString(`${value.href}|${value.string}|${value.debug}`);
 
+    // Insert event record
     const inserted = await events.insert(value);
     res.json(inserted);
   } catch (error) {
