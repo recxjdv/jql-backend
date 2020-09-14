@@ -106,6 +106,7 @@ router.post('/', async (req, res, next) => {
       const filter = {
         hrefStringHash: value.hashHrefString,
       };
+      // FIXME: Event counter incrementing #2
       const update = {
         $inc: {
           count: 1,
@@ -115,6 +116,7 @@ router.post('/', async (req, res, next) => {
         multi: false,
         upsert: true
       };
+      // FIXME: update in mongoose is deprecated #1
       const dbResponse = await events.update(filter, update, options);
       if (dbResponse.upserted) {
         // Add internal record elements
