@@ -31,11 +31,32 @@ const router = express.Router();
 
 // Read all
 router.get('/', async (req, res, next) => {
-  try {
-    const items = await events.find({});
-    res.json(items);
-  } catch (error) {
-    next(error);
+  // Was there a search param supplied?
+  const searchString = req.query.search;
+  if (searchString) {
+    // const searchRegex = `/${searchString}/`;
+    // console.log(searchRegex);
+    try {
+      const findRegex = {
+        string: {
+          $regex: new RegExp(searchString),
+          $options: 'i'
+        }
+      };
+      const searchItems = await events.find(findRegex);
+      res.json(searchItems);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    console.log('BBB');
+    // If no search param, then return all events
+    try {
+      const items = await events.find({});
+      res.json(items);
+    } catch (error) {
+      next(error);
+    }
   }
 });
 
