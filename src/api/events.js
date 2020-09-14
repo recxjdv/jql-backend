@@ -35,8 +35,8 @@ router.get('/', async (req, res, next) => {
   // Ref: https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS
   // Fix ref: https://snyk.io/blog/redos-and-catastrophic-backtracking/
   // - Replace all instances of the JavaScript regular expression LookAhead syntax
-  const searchString = req.query.search.replace(/\?=/g, '');
-  if (searchString) {
+  if (req.query.search) {
+    const searchString = req.query.search.replace(/\?=/g, '');
     try {
       const findRegex = {
         string: {
