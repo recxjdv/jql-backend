@@ -149,8 +149,6 @@ router.put('/:id', async (req, res, next) => {
     const searchFilter = {
       _id: id
     };
-    // FIXME: This put should use a different Joi validation schema
-    // TODO: Check on update that an updated timestamp is added by the monk middleware
     const value = await createEventSchema.validateAsync(req.body);
     const update = {
       $set: value
