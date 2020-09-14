@@ -113,3 +113,6 @@ documentation/
 
 # Docker test containers
 containers/
+
+# Known safe file
+src/config/knownSafe.json
