@@ -32,10 +32,9 @@ const router = express.Router();
 // Read all
 router.get('/', async (req, res, next) => {
   // Was there a search param supplied?
+  // FIXME: https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS
   const searchString = req.query.search;
   if (searchString) {
-    // const searchRegex = `/${searchString}/`;
-    // console.log(searchRegex);
     try {
       const findRegex = {
         string: {
@@ -49,7 +48,6 @@ router.get('/', async (req, res, next) => {
       next(error);
     }
   } else {
-    console.log('BBB');
     // If no search param, then return all events
     try {
       const items = await events.find({});
