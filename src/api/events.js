@@ -65,7 +65,6 @@ router.post('/', async (req, res, next) => {
 
     // Create the string hash
     value.stringHash = hashString(value.string);
-
     // Check whether the submission is a known safe string
     const searchFilter_checkKnownSafe = {
       knownSafe: 1,
@@ -80,22 +79,40 @@ router.post('/', async (req, res, next) => {
         knownSafeMessage
       });
     } else {
-      // New data not considered safe
-
-      // Add internal record elements
-      value.count = 1;
-      value.knownSafe = 0;
+      // Event not known safe
+      // - check to see if we've seen this event before
       value.hashHrefString = hashString(`${value.href}|${value.string}|${value.debug}`);
-
-      // Insert event record
-      const inserted = await events.insert(value);
-      if (inserted) {
-        const message = `jQuery event successfully inserted, id: ${inserted._id}`;
-        res.json({
-          message
-        });
+      const filter = {
+        hrefStringHash: value.hashHrefString,
+      };
+      const update = {
+        $inc: {
+          count: 1,
+        },
+      };
+      const options = {
+        multi: false,
+        upsert: true
+      };
+      const dbResponse = await events.update(filter, update, options);
+      if (dbResponse.upserted) {
+        // Add internal record elements
+        value.count = 1;
+        value.knownSafe = 0;
+        const inserted = await events.insert(value);
+        if (inserted) {
+          const message = `jQuery event successfully inserted, id: ${inserted._id}`;
+          res.json({
+            message
+          });
+        } else {
+          next();
+        }
       } else {
-        next();
+        const knownEventMessage = 'Existing event, count incremented';
+        res.json({
+          knownEventMessage
+        });
       }
     }
   } catch (error) {
