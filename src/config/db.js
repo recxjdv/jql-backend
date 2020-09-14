@@ -8,8 +8,6 @@ const { hashString } = require('../helpers/helpers');
 const db = monk(process.env.MONGO_URI);
 const knownSafeFile = process.env.KNOWN_SAFE;
 
-db.addMiddleware(require('monk-middleware-timestamps'));
-
 const events = db.get('events');
 
 // Create an async function to import the data
