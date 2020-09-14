@@ -63,21 +63,40 @@ router.post('/', async (req, res, next) => {
     // Validate the body
     const value = await createEventSchema.validateAsync(req.body);
 
-    // Add internal record elements
-    value.count = 1;
-    value.knownSafe = 0;
+    // Create the string hash
     value.stringHash = hashString(value.string);
-    value.hashHrefString = hashString(`${value.href}|${value.string}|${value.debug}`);
 
-    // Insert event record
-    const inserted = await events.insert(value);
-    if (inserted) {
-      const message = `jQuery event successfully inserted, id: ${inserted._id}`;
+    // Check whether the submission is a known safe string
+    const searchFilter_checkKnownSafe = {
+      knownSafe: 1,
+      stringHash: value.stringHash,
+    };
+    // Ref: https://automattic.github.io/monk/docs/collection/count.html
+    const knownSafeCount = await events.count(searchFilter_checkKnownSafe);
+    if (knownSafeCount > 0) {
+      const knownSafeMessage = 'Known safe jQuery event';
+      // TODO: Increment the count of times seen - might be interesting
       res.json({
-        message
+        knownSafeMessage
       });
     } else {
-      next();
+      // New data not considered safe
+
+      // Add internal record elements
+      value.count = 1;
+      value.knownSafe = 0;
+      value.hashHrefString = hashString(`${value.href}|${value.string}|${value.debug}`);
+
+      // Insert event record
+      const inserted = await events.insert(value);
+      if (inserted) {
+        const message = `jQuery event successfully inserted, id: ${inserted._id}`;
+        res.json({
+          message
+        });
+      } else {
+        next();
+      }
     }
   } catch (error) {
     next(error);
