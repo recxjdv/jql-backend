@@ -116,3 +116,5 @@ containers/
 
 # Known safe file
 src/config/knownSafe.json
+src/config/knownSafe.dev
+src/config/knownSafe.prod
