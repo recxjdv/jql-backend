@@ -116,8 +116,8 @@ router.post('/', async (req, res, next) => {
         multi: false,
         upsert: true
       };
-      // FIXME: update in mongoose is deprecated #1
       const dbResponse = await events.update(filter, update, options);
+      console.log(dbResponse);
       if (dbResponse.upserted) {
         // Add internal record elements
         value.count = 1;
