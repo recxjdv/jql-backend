@@ -104,21 +104,19 @@ router.post('/', async (req, res, next) => {
       // - check to see if we've seen this event before
       value.hashHrefString = hashString(`${value.href}|${value.string}|${value.debug}`);
       const filter = {
-        hrefStringHash: value.hashHrefString,
+        knownSafe: 0,
+        hashHrefString: value.hashHrefString,
       };
-      // FIXME: Event counter incrementing #2
       const update = {
         $inc: {
           count: 1,
         },
       };
       const options = {
-        multi: false,
-        upsert: true
+        upsert: false,
       };
       const dbResponse = await events.update(filter, update, options);
-      console.log(dbResponse);
-      if (dbResponse.upserted) {
+      if (dbResponse.nModified === 0) {
         // Add internal record elements
         value.count = 1;
         value.knownSafe = 0;
@@ -128,8 +126,6 @@ router.post('/', async (req, res, next) => {
           res.json({
             message
           });
-        } else {
-          next();
         }
       } else {
         const knownEventMessage = 'Existing event, count incremented';
