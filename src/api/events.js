@@ -9,7 +9,8 @@ const events = require('../config/db');
 const { hashString } = require('../helpers/helpers');
 // const { arrNoDupe } = require('../helpers/helpers');
 
-// Establish the event schema
+// Validation
+// - Establish the event schema
 const createEventSchema = Joi.object({
   // method: jQuery method name (e.g. .html, .append etc)
   method: Joi.string().trim().required(),
@@ -25,6 +26,10 @@ const createEventSchema = Joi.object({
   string: Joi.string().trim().required(),
   // debug: Stack trace from the browser
   debug: Joi.string().trim().required()
+});
+// - Update a record (toggle knownSafe)
+const updateKnownSafe = Joi.object({
+  knownSafe: Joi.number().integer().min(0).max(1)
 });
 
 const router = express.Router();
@@ -140,14 +145,14 @@ router.post('/', async (req, res, next) => {
 });
 
 // Update one
-// - full replacement of the item
+// - used to toggle update the knownSafe flag
 router.put('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     const searchFilter = {
       _id: id
     };
-    const value = await createEventSchema.validateAsync(req.body);
+    const value = await updateKnownSafe.validateAsync(req.body);
     const update = {
       $set: value
     };
