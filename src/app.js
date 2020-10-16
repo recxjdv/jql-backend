@@ -16,12 +16,11 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// Remove header
+app.disable('x-powered-by');
+
 // Static contents
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Get / worked okay!'
-  });
-});
+app.use('/', express.static('src/public'));
 
 // API router
 app.use('/api/v1', api);
