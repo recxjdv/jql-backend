@@ -12,14 +12,14 @@ describe('app', () => {
   });
 });
 
+// This is correct, a 404 should be returned by the backend.
+// - in production, this is handled by jql-frontend in a different container.
 describe('GET /', () => {
-  it('responds with a json message', (done) => {
+  it('responds with a not found message', (done) => {
     request(app)
       .get('/')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(200, {
-        message: 'Get / worked okay!'
-      }, done);
+      .expect(404, done);
   });
 });
