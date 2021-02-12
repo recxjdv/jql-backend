@@ -1,5 +1,7 @@
 {
     "trackedPackages": {
+      "recxKnownGood|1_2_3": false,
+      "recxKnownBad|0_0_1": true,
       "jquery|3_5_1": false,
       "jquery|3_5_0": true,
       "jquery|1_12_1": true
