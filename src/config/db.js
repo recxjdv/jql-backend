@@ -7,8 +7,10 @@ const { hashString } = require('../helpers/helpers');
 // Import env properties
 const db = monk(process.env.MONGO_URI);
 const knownSafeFile = process.env.KNOWN_SAFE;
+const vulnerableVersionData = process.env.VULNERABLE_VERSION_DATA;
 
 const events = db.get('events');
+const lookup = db.get('lookup');
 
 // Create an async function to import the data
 // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
@@ -43,6 +45,13 @@ function importKnownSafeStrings() {
   });
 }
 
+function importVulnerableVersionData() {
+  const importVulnerableVersion = fs.readFileSync(vulnerableVersionData);
+  const vulnerableVersions = JSON.parse(importVulnerableVersion);
+  lookup.insert(vulnerableVersions);
+}
+
 importKnownSafeStrings();
+//importVulnerableVersionData();
 
 module.exports = events;
