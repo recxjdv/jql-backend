@@ -1,8 +1,9 @@
 const express = require('express');
+const { ValidationError } = require('joi');
 const Joi = require('joi');
 
 // Data store
-const events = require('../config/db');
+const lookup = require('../config/db');
 
 // Validation
 // - Establish the lookup schema
@@ -20,10 +21,32 @@ router.post('/', async (req, res, next) => {
     try {
         // Validate the body
         const value = await lookupPackage.validateAsync(req.body);
-        const message = `Lookup attempted`;
-        res.json({
-            message
-        });
+        console.log(value.name);
+        console.log(value.version);
+
+        // Lookup in the database
+        const searchFilter = {
+            name: value.name,
+            version: value.version
+        };
+        const packageData = await lookup.findOne(searchFilter);
+        let foundMessage = {
+            state: ''
+        };
+        if (packageData) {
+            console.log(packageData);
+            if (packageData.state === false) {
+                console.log('false - ok');
+                foundMessage.state = 'ok'
+            } else {
+                console.log('!false - vulnerable');
+                foundMessage.state = 'vulnerable'
+            }
+            res.json(foundMessage);
+        } else {
+            foundMessage.state = 'not found';
+            res.json(foundMessage);
+        }
     } catch (error) {
       next(error);
     }

@@ -21,4 +21,57 @@ describe('POST /api/v1/lookup', () => {
       .expect(200)
       .end(done);
   });
+  it('bad data should return not found', (done) => {
+    const postData = {
+      name: 'badpackagename',
+      version:'99.99.99'
+    };
+    const expectedResponse = {
+      state: 'not found'
+    };
+    request(app)
+      .post('/api/v1/lookup')
+      .send(postData  )
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(expectedResponse)
+      .expect(200)
+      .end(done);
+  });
+  it('bad data should return ok', (done) => {
+    const postData = {
+      name: 'recxKnownGood',
+      version:'1.2.3'
+    };
+    const expectedResponse = {
+      state: 'ok'
+    };
+    request(app)
+      .post('/api/v1/lookup')
+      .send(postData  )
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(expectedResponse)
+      .expect(200)
+      .end(done);
+  });
+  it('bad data should return vulnerable', (done) => {
+    const postData = {
+      name: 'recxKnownBad',
+      version:'0.0.1'
+    };
+    const expectedResponse = {
+      state: 'vulnerable'
+    };
+    request(app)
+      .post('/api/v1/lookup')
+      .send(postData  )
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(expectedResponse)
+      .expect(200)
+      .end(done);
+  });
+
+  
 });
