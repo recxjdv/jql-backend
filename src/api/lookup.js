@@ -21,9 +21,7 @@ router.post('/', async (req, res, next) => {
     try {
         // Validate the body
         const value = await lookupPackage.validateAsync(req.body);
-        console.log(value.name);
-        console.log(value.version);
-
+        
         // Lookup in the database
         const searchFilter = {
             name: value.name,
@@ -36,10 +34,8 @@ router.post('/', async (req, res, next) => {
         if (packageData) {
             console.log(packageData);
             if (packageData.state === false) {
-                console.log('false - ok');
                 foundMessage.state = 'ok'
             } else {
-                console.log('!false - vulnerable');
                 foundMessage.state = 'vulnerable'
             }
             res.json(foundMessage);
