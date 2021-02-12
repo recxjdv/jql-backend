@@ -1,5 +1,7 @@
 {
-    "jquery": {
-        "3.5.0":false
+    "trackedPackages": {
+      "jquery|3_5_1": false,
+      "jquery|3_5_0": true,
+      "jquery|1_12_1": true
     }
 }

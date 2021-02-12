@@ -4,13 +4,17 @@ const monk = require('monk');
 // Helper functions
 const { hashString } = require('../helpers/helpers');
 
-// Import env properties
+// Import env event properties
 const db = monk(process.env.MONGO_URI);
 const knownSafeFile = process.env.KNOWN_SAFE;
-const vulnerableVersionData = process.env.VULNERABLE_VERSION_DATA;
 
 const events = db.get('events');
-const lookup = db.get('lookup');
+
+// Import env lookup properties
+const lookupDb = monk(process.env.MONGO_LOOKUP_URI);
+const vulnerableVersionData = process.env.VULNERABLE_VERSION_DATA;
+
+const lookup = lookupDb.get('lookup');
 
 // Create an async function to import the data
 // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
@@ -45,13 +49,34 @@ function importKnownSafeStrings() {
   });
 }
 
-function importVulnerableVersionData() {
+async function importVulnerableVersionData() {
   const importVulnerableVersion = fs.readFileSync(vulnerableVersionData);
   const vulnerableVersions = JSON.parse(importVulnerableVersion);
-  lookup.insert(vulnerableVersions);
+  for (var key in vulnerableVersions.trackedPackages) {
+    let packageNameVersion = key;
+    let [packageName, packageVersion] = packageNameVersion.split("|");
+    packageVersion = packageVersion.replace(/_/g, '.');
+    let packageState = vulnerableVersions.trackedPackages[key]
+    const filter = {
+      name: packageName, 
+      version: packageVersion,
+      state: packageState
+    };
+    await lookup.findOne(filter, async (dbFindError, dbResponse) => {
+      if (dbResponse === null) {
+        const storePackageInformation = {
+          name: packageName,
+          version: packageVersion,
+          state: packageState
+        };
+        await lookup.insert(storePackageInformation);
+      }
+    });
+  }
 }
 
 importKnownSafeStrings();
-//importVulnerableVersionData();
+importVulnerableVersionData();
 
 module.exports = events;
+module.exports = lookup;
